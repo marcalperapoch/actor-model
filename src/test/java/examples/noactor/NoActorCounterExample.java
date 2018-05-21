@@ -1,28 +1,23 @@
-package examples.counter;
+package examples.noactor;
 
-import com.perapoch.concurrency.core.ActorAddress;
-import com.perapoch.concurrency.core.Message;
-import examples.BaseExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class CounterExample extends BaseExample {
+public class NoActorCounterExample {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CounterExample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoActorCounterExample.class);
 
     private static final int NUM_THREADS = 20;
-    private static final Message INCREMENT_MSG = new Message("inc");
 
-    @Override
     public void test() {
-        final ActorAddress counter = actorRegistry.newActor(CounterActor.class, "counter");
-        final ActorAddress checker = actorRegistry.newActor(CheckerActor.class, "checker", counter);
+
+        final Counter counter = new Counter();
 
         final ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
         final CompletableFuture[] futures = new CompletableFuture[NUM_THREADS];
@@ -35,7 +30,8 @@ public class CounterExample extends BaseExample {
 
             TimeUnit.SECONDS.sleep(1);
 
-            checker.tell(new Message("ask"));
+            final int result = counter.get();
+            LOGGER.info("Result {}", result);
 
         } catch (Exception e) {
            throw new RuntimeException(e);
@@ -47,16 +43,16 @@ public class CounterExample extends BaseExample {
 
     public static void main(String[] args) {
         final long initialTime = System.currentTimeMillis();
-        new CounterExample().test();
+        new NoActorCounterExample().test();
         LOGGER.info("Time: {}ms", System.currentTimeMillis() - initialTime);
     }
 
     private static class Incrementer implements Runnable {
 
-        private final ActorAddress counter;
+        private final Counter counter;
         private final String name;
 
-        private Incrementer(ActorAddress counter, int index) {
+        private Incrementer(Counter counter, int index) {
             this.counter = counter;
             this.name = "Incrementor[" + index + "]";
         }
@@ -65,9 +61,26 @@ public class CounterExample extends BaseExample {
         public void run() {
             LOGGER.info("Starting {} ...", name);
             for(int i = 0; i < 500; ++i) {
-                counter.tell(INCREMENT_MSG);
+                counter.inc();
             }
             LOGGER.info("Finished {}", name);
+        }
+    }
+
+    private static final class Counter {
+
+        private final AtomicInteger counter;
+
+        public Counter() {
+            this.counter = new AtomicInteger(0);
+        }
+
+        public void inc() {
+            counter.incrementAndGet();
+        }
+
+        public int get() {
+            return counter.get();
         }
     }
 }
