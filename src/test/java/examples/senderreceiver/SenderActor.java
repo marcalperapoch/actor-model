@@ -1,4 +1,4 @@
-package com.perapoch.concurrency;
+package examples.senderreceiver;
 
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.ActorAddress;

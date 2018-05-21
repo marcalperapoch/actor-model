@@ -31,11 +31,6 @@ public class ActorRegistryImpl implements ActorRegistry {
         }
     }
 
-    @Override
-    public List<Actor> getActors() {
-        return new ArrayList<>(registry.values());
-    }
-
     private Class<?>[] toTypes(Object ...  args) {
         return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
     }
