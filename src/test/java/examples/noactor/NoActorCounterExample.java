@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class NoActorCounterExample {
@@ -27,8 +26,6 @@ public class NoActorCounterExample {
             }
 
             CompletableFuture.allOf(futures).get();
-
-            TimeUnit.SECONDS.sleep(1);
 
             final int result = counter.get();
             LOGGER.info("Result {}", result);

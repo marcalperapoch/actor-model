@@ -6,11 +6,9 @@ import examples.BaseExample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class CounterExample extends BaseExample {
 
@@ -32,8 +30,6 @@ public class CounterExample extends BaseExample {
             }
 
             CompletableFuture.allOf(futures).get();
-
-            TimeUnit.SECONDS.sleep(1);
 
             checker.tell(new Message("ask"));
 
