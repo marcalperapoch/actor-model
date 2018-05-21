@@ -18,6 +18,7 @@ public class MessageDispatcher extends Thread {
     private final AtomicInteger pendingMessages;
 
     public MessageDispatcher(int numThreads) {
+        super("MessageDispatcher");
         this.actors = new ConcurrentHashMap<>();
         this.mailboxes = new ConcurrentHashMap<>();
         this.executorService = Executors.newFixedThreadPool(numThreads);
@@ -26,12 +27,12 @@ public class MessageDispatcher extends Thread {
         this.pendingMessages = new AtomicInteger(0);
     }
 
-    public void addActor(Actor actor) {
+    void addActor(Actor actor) {
         mailboxes.put(actor, new Mailbox());
         actors.put(actor, false);
     }
 
-    public void newMessage(final Actor actor, final Message message) {
+    void newMessage(final Actor actor, final Message message) {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {

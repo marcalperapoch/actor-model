@@ -1,14 +1,14 @@
 package com.perapoch.concurrency.core;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 final class Mailbox {
 
     final Queue<Message> messages;
 
     Mailbox() {
-        this.messages = new ConcurrentLinkedDeque<>();
+        this.messages = new ArrayDeque<>();
     }
 
     void receive(final Message message) {
