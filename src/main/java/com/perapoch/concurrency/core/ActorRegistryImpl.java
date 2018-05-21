@@ -17,7 +17,7 @@ public class ActorRegistryImpl implements ActorRegistry {
     @Override
     public void tell(ActorAddress to, Message msg, ActorAddress from) {
         msg.setFrom(from);
-        registry.get(to).getMailbox().receive(msg);
+        messageDispatcher.newMessage(registry.get(to), msg);
     }
 
     @Override
