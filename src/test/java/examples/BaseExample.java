@@ -15,7 +15,7 @@ public abstract class BaseExample {
     }
 
     public BaseExample(int numThreads) {
-        actorRegistry = new ActorRegistryImpl(new MessageDispatcher(10));
+        actorRegistry = new ActorRegistryImpl(new MessageDispatcher(numThreads));
     }
 
     public abstract void test();

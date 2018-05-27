@@ -1,5 +1,7 @@
 package com.perapoch.concurrency.core;
 
+import java.util.Objects;
+
 public final class ActorAddress {
 
     private static final ActorAddress NO_SENDER = new ActorAddress("no address");
@@ -26,9 +28,34 @@ public final class ActorAddress {
         registry.tell(this, msg, NO_SENDER);
     }
 
+    public <T extends Actor> void restart() {
+        checkRegistry();
+        registry.restart(address);
+    }
+
     private void checkRegistry() {
         if (registry == null) {
             throw new UnsupportedOperationException("You can not send msg to a no sender address");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActorAddress that = (ActorAddress) o;
+        return Objects.equals(address, that.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address);
+    }
+
+    @Override
+    public String toString() {
+        return "ActorAddress{" +
+                "address='" + address + '\'' +
+                '}';
     }
 }

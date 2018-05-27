@@ -40,4 +40,11 @@ public class Message {
     public int hashCode() {
         return Objects.hash(value);
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "value='" + value + '\'' +
+                '}';
+    }
 }
