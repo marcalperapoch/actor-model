@@ -10,8 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class MessageDispatcher extends Thread {
 
-    private final Map<Actor, Boolean> actors;
-    private final Map<Actor, Mailbox> mailboxes;
+    private final Map<Actor, Boolean> runningActors;
     private final ExecutorService executorService;
     private final ReentrantLock lock;
     private final Condition notFull;
@@ -19,8 +18,7 @@ public class MessageDispatcher extends Thread {
 
     public MessageDispatcher(int numThreads) {
         super("MessageDispatcher");
-        this.actors = new ConcurrentHashMap<>();
-        this.mailboxes = new ConcurrentHashMap<>();
+        this.runningActors = new ConcurrentHashMap<>();
         this.executorService = Executors.newFixedThreadPool(numThreads);
         this.lock = new ReentrantLock();
         this.notFull = lock.newCondition();
@@ -28,15 +26,14 @@ public class MessageDispatcher extends Thread {
     }
 
     void addActor(Actor actor) {
-        mailboxes.put(actor, new Mailbox());
-        actors.put(actor, false);
+        runningActors.put(actor, false);
     }
 
     void newMessage(final Actor actor, final Message message) {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            mailboxes.get(actor).receive(message);
+            actor.enqueueMessage(message);
             pendingMessages.incrementAndGet();
             notFull.signal();
         } finally {
@@ -60,20 +57,20 @@ public class MessageDispatcher extends Thread {
                 }
 
                 final List<Actor> actorsToRun = new ArrayList<>();
-                actors.forEach((actor, consuming) -> {
-                    if (!consuming && hasPendingMessages(actor)) {
+                runningActors.forEach((actor, consuming) -> {
+                    if (!consuming && actor.hasPendingMessages()) {
                         actorsToRun.add(actor);
                     }
                 });
                 actorsToRun.forEach(actor -> {
 
-                    actors.put(actor, true);
-                    final Message msg = mailboxes.get(actor).getNextMessage();
+                    runningActors.put(actor, true);
+                    final Message msg = actor.getNextMessage();
 
                     executorService.submit(() -> {
                         actor.onReceive(msg);
                         pendingMessages.decrementAndGet();
-                        actors.put(actor, false);
+                        runningActors.put(actor, false);
                     });
                 });
 
@@ -83,7 +80,4 @@ public class MessageDispatcher extends Thread {
         }
     }
 
-    private boolean hasPendingMessages(Actor actor) {
-        return mailboxes.get(actor).hasPendingMessages();
-    }
 }
