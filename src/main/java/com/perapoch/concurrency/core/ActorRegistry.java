@@ -1,10 +1,16 @@
 package com.perapoch.concurrency.core;
 
+import com.perapoch.concurrency.ActorAddress;
+
+import java.nio.file.Path;
+
 public interface ActorRegistry {
 
-    void tell(ActorAddress to, Message msg, ActorAddress from);
+    default Actor getActorByAddress(ActorAddress address) {
+        return getActorByPath(address.getPath());
+    }
 
-    <T extends Actor> ActorAddress newActor(Class<T> klass, String name, Object ... args);
+    Actor getActorByPath(Path path);
 
-    <T extends Actor> void restart(String actorName);
+    void registerActor(Actor actor);
 }

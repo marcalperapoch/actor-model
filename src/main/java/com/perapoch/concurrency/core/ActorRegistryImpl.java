@@ -1,77 +1,43 @@
 package com.perapoch.concurrency.core;
 
-import java.util.Arrays;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ActorRegistryImpl implements ActorRegistry {
 
-    private final Map<ActorAddress, Actor> registry;
-    private final Map<String, ActorRecipe> actorRecipes;
-    private final MessageDispatcher messageDispatcher;
-    private final ActorAddress rootSupervisor;
+    private final Map<Path, Actor> registry;
 
-    public ActorRegistryImpl(MessageDispatcher messageDispatcher) {
-        this.messageDispatcher = messageDispatcher;
+    public ActorRegistryImpl() {
         this.registry = new ConcurrentHashMap<>();
-        this.actorRecipes = new ConcurrentHashMap<>();
-        this.rootSupervisor = newActor(RootSupervisor.class, "root");
-        this.messageDispatcher.start();
     }
 
     @Override
-    public void tell(ActorAddress to, Message msg, ActorAddress from) {
-        msg.setFrom(from);
-        messageDispatcher.newMessage(registry.get(to), msg);
+    public Actor getActorByPath(Path path) {
+        return registry.get(path);
     }
 
     @Override
-    public <T extends Actor> ActorAddress newActor(Class<T> klass, String name, Object ... args) {
-        try {
-            final Class<?>[] types = toTypes(args);
-            final Actor actor = klass.getConstructor(types).newInstance(args);
-            return register(actor, name, args);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public void registerActor(final Actor actor) {
 
-    @Override
-    public <T extends Actor> void restart(String actorName) {
-
-        final ActorRecipe recipe = actorRecipes.get(actorName);
-        if (recipe != null) {
-            final ActorAddress restartedActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
-            messageDispatcher.markAsHealthy(restartedActor);
-        }
-    }
-
-    private Class<?>[] toTypes(Object ...  args) {
-        return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
-    }
-
-    private ActorAddress register(Actor actor, String name, Object ... args) {
-        final ActorAddress actorAddress = new ActorAddress(this, name);
-        actor.setAddress(actorAddress);
-        actorRecipes.computeIfAbsent(name, actorName ->  new ActorRecipe(actor.getClass(), name, args));
-
-        registry.compute(actorAddress, (address, oldActor) -> {
+        registry.compute(actor.getPath(), (address, oldActor) -> {
             if (oldActor == null) {
-                actor.setParentAddress(rootSupervisor);
                 return actor;
             } else {
-                actor.setParentAddress(oldActor.getParentAddress());
-                while (oldActor.hasPendingMessages()) {
-                    messageDispatcher.newMessage(actor, oldActor.getNextMessage());
-                }
+                actor.copyMessagesFrom(oldActor);
                 return actor;
             }
         });
-
-
-        return actorAddress;
     }
 
+    /*@Override
+    public void restart(String actorName) {
+        final ActorRecipe recipe = actorRecipes.get(actorName);
+        if (recipe != null) {
+            final ActorAddressImpl restartedActor = registerActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
+            //messageDispatcher.markAsHealthy(restartedActor); // TODO: review
+        }
+    }*/
 
 
 }

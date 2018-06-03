@@ -12,7 +12,9 @@ public class NoActorCounterExample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NoActorCounterExample.class);
 
-    private static final int NUM_THREADS = 20;
+    private static final int NUM_THREADS = 4;
+    private static final int MESSAGES_TO_SEND = 10000;
+    private static final int MESSAGE_PER_THREAD = MESSAGES_TO_SEND / NUM_THREADS;
 
     public void test() {
 
@@ -57,7 +59,7 @@ public class NoActorCounterExample {
         @Override
         public void run() {
             LOGGER.info("Starting {} ...", name);
-            for(int i = 0; i < 500; ++i) {
+            for(int i = 0; i < MESSAGE_PER_THREAD; ++i) {
                 counter.inc();
             }
             LOGGER.info("Finished {}", name);

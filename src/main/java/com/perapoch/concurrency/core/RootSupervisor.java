@@ -9,14 +9,14 @@ public final class RootSupervisor extends Actor {
 
     @Override
     protected void onReceive(Message msg) {
-        if ("FailedMessage".equals(msg.getValue())) {
+        if ("Not delivered message".equals(msg.getValue())) {
             final FailedMessage failedMessage = FailedMessage.class.cast(msg);
 
             LOGGER.error("Message {} could not be delivered to {}. Restarting destinatary...",
                     failedMessage.getOriginalMessage(),
                     failedMessage.getDestinatary());
 
-            failedMessage.getDestinatary().restart();
+            getContext().restart(failedMessage.getDestinatary());
         }
     }
 

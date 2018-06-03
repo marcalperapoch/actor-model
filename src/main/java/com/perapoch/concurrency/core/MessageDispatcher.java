@@ -1,9 +1,11 @@
 package com.perapoch.concurrency.core;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.perapoch.concurrency.ActorAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +16,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class MessageDispatcher extends Thread {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageDispatcher.class);
+
+    private final ActorRegistry registry;
     private final Map<Actor, Boolean> runningActors;
     private final Set<ActorAddress> crashedActors;
     private final ExecutorService executorService;
@@ -21,8 +26,9 @@ public class MessageDispatcher extends Thread {
     private final Condition notFull;
     private final AtomicInteger pendingMessages;
 
-    public MessageDispatcher(int numThreads) {
+    public MessageDispatcher(ActorRegistry registry, int numThreads) {
         super("MessageDispatcher");
+        this.registry = registry;
         this.runningActors = new ConcurrentHashMap<>();
         this.executorService = Executors.newFixedThreadPool(numThreads);
         this.lock = new ReentrantLock();
@@ -35,7 +41,7 @@ public class MessageDispatcher extends Thread {
         runningActors.putIfAbsent(actor, false);
 
         if (crashedActors.contains(actor)) {
-            System.out.println("Trying to send a msg to a dead actor");
+            LOGGER.error("Trying to send a msg to a dead actor");
         }
 
         final ReentrantLock lock = this.lock;
@@ -54,26 +60,25 @@ public class MessageDispatcher extends Thread {
         try {
             while (true) {
 
+                final Map<Actor, Message> actorsToRun = new HashMap<>();
+
                 final ReentrantLock lock = this.lock;
                 lock.lockInterruptibly();
                 try {
                     while (pendingMessages.get() == 0) {
                         notFull.await();
                     }
+                    runningActors.forEach((actor, consuming) -> {
+                        if (!crashedActors.contains(actor.self()) && !consuming && actor.hasPendingMessages()) {
+                            runningActors.put(actor, true);
+                            actorsToRun.put(actor, actor.getNextMessage());
+                        }
+                    });
                 } finally {
                     lock.unlock();
                 }
 
-                final List<Actor> actorsToRun = new ArrayList<>();
-                runningActors.forEach((actor, consuming) -> {
-                    if (!crashedActors.contains(actor.self()) && !consuming && actor.hasPendingMessages()) {
-                        actorsToRun.add(actor);
-                    }
-                });
-                actorsToRun.forEach(actor -> {
-
-                    runningActors.put(actor, true);
-                    final Message msg = actor.getNextMessage();
+                actorsToRun.forEach((actor, msg) -> {
 
                     executorService.submit(() -> {
                         try {
@@ -83,9 +88,15 @@ public class MessageDispatcher extends Thread {
                         } catch (Exception ex) {
                             crashedActors.add(actor.getAddress());
                             runningActors.remove(actor);
-                            actor.getParentAddress().tell(new FailedMessage("FailedMessage", msg, actor.getAddress()));
+                            final Path path = actor.getPath();
+                            final Path parentPath = path.getParent();
+                            if (parentPath != null && !"/".equals(parentPath)) { // not the root actor
+                                final Actor parentActor = registry.getActorByPath(parentPath);
+                                parentActor.getAddress().tell(new FailedMessage("Not delivered message", msg, actor.getAddress()));
+                            }
                         }
                     });
+
                 });
 
             }

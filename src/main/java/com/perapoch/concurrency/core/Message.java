@@ -1,5 +1,7 @@
 package com.perapoch.concurrency.core;
 
+import com.perapoch.concurrency.ActorAddress;
+
 import java.util.Objects;
 import java.util.Optional;
 

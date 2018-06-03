@@ -1,21 +1,21 @@
 package examples;
 
-import com.perapoch.concurrency.core.ActorRegistry;
-import com.perapoch.concurrency.core.ActorRegistryImpl;
-import com.perapoch.concurrency.core.MessageDispatcher;
+import com.perapoch.concurrency.ActorSystem;
+import com.perapoch.concurrency.core.ActorSystemImpl;
 
 public abstract class BaseExample {
 
     private static final int DEFAULT_NUM_THREADS = 10;
 
-    protected final ActorRegistry actorRegistry;
+    protected final ActorSystem actorSystem;
 
     public BaseExample() {
         this(DEFAULT_NUM_THREADS);
     }
 
     public BaseExample(int numThreads) {
-        actorRegistry = new ActorRegistryImpl(new MessageDispatcher(numThreads));
+        actorSystem = new ActorSystemImpl(numThreads);
+        actorSystem.start();
     }
 
     public abstract void test();

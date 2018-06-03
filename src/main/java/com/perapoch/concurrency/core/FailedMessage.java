@@ -1,5 +1,7 @@
 package com.perapoch.concurrency.core;
 
+import com.perapoch.concurrency.ActorAddress;
+
 public class FailedMessage extends Message {
 
     private final Message originalMessage;

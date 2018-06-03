@@ -1,6 +1,6 @@
 package examples.counter;
 
-import com.perapoch.concurrency.core.ActorAddress;
+import com.perapoch.concurrency.ActorAddress;
 import com.perapoch.concurrency.core.Message;
 import examples.BaseExample;
 import org.slf4j.Logger;
@@ -14,13 +14,15 @@ public class CounterExample extends BaseExample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterExample.class);
 
-    private static final int NUM_THREADS = 20;
+    private static final int MESSAGES_TO_SEND = 10000;
+    private static final int NUM_THREADS = 4;
+    private static final int MESSAGE_PER_THREAD = MESSAGES_TO_SEND / NUM_THREADS;
     private static final Message INCREMENT_MSG = new Message("inc");
 
     @Override
     public void test() {
-        final ActorAddress counter = actorRegistry.newActor(CounterActor.class, "counter");
-        final ActorAddress checker = actorRegistry.newActor(CheckerActor.class, "checker", counter);
+        final ActorAddress counter = actorSystem.newActor(CounterActor.class, "counter");
+        final ActorAddress checker = actorSystem.newActor(CheckerActor.class, "checker", counter);
 
         final ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
         final CompletableFuture[] futures = new CompletableFuture[NUM_THREADS];
@@ -60,7 +62,7 @@ public class CounterExample extends BaseExample {
         @Override
         public void run() {
             LOGGER.info("Starting {} ...", name);
-            for(int i = 0; i < 500; ++i) {
+            for(int i = 0; i < MESSAGE_PER_THREAD; ++i) {
                 counter.tell(INCREMENT_MSG);
             }
             LOGGER.info("Finished {}", name);

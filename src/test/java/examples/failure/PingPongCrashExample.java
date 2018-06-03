@@ -1,6 +1,6 @@
 package examples.failure;
 
-import com.perapoch.concurrency.core.ActorAddress;
+import com.perapoch.concurrency.ActorAddress;
 import com.perapoch.concurrency.core.Message;
 import examples.BaseExample;
 
@@ -12,8 +12,8 @@ public class PingPongCrashExample extends BaseExample {
 
     public void test() {
 
-        final ActorAddress ponger = actorRegistry.newActor(CrashingPongActor.class, "crasheable ponger","pum!");
-        final ActorAddress pinger = actorRegistry.newActor(PingActor.class, "ping", ponger);
+        final ActorAddress ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger","pum!");
+        final ActorAddress pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
 
         pinger.tell(new Message("start"));
 

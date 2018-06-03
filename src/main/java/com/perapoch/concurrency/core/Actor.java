@@ -1,5 +1,9 @@
 package com.perapoch.concurrency.core;
 
+import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorContext;
+
+import java.nio.file.Path;
 import java.util.Objects;
 
 public abstract class Actor {
@@ -7,21 +11,12 @@ public abstract class Actor {
     private final Mailbox mailbox;
 
     private ActorAddress address;
-    private ActorAddress parentAddress;
 
     public Actor() {
         this.mailbox = new Mailbox();
     }
 
     protected abstract void onReceive(Message msg);
-
-    void setParentAddress(ActorAddress parentAddress) {
-        this.parentAddress = parentAddress;
-    }
-
-    ActorAddress getParentAddress() {
-        return parentAddress;
-    }
 
     void setAddress(ActorAddress address) {
         this.address = address;
@@ -31,7 +26,7 @@ public abstract class Actor {
         return address;
     }
 
-    protected ActorAddress getAddress() {
+    ActorAddress getAddress() {
         return self();
     }
 
@@ -47,6 +42,20 @@ public abstract class Actor {
         return mailbox.getNextMessage();
     }
 
+    void copyMessagesFrom(final Actor other) {
+        /*while (other.hasPendingMessages()) {
+            messageDispatcher.newMessage(actor, oldActor.getNextMessage());
+        }*/
+    }
+
+    ActorContext getContext() {
+        return address.getContext();
+    }
+
+    Path getPath() {
+        return getContext().getPath();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,4 +68,6 @@ public abstract class Actor {
     public int hashCode() {
         return Objects.hash(address);
     }
+
+
 }
