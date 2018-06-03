@@ -1,10 +1,11 @@
 package com.perapoch.concurrency;
 
 import com.perapoch.concurrency.core.Actor;
+import com.perapoch.concurrency.core.Message;
 
 public interface ActorFactory {
 
     <T extends Actor> ActorAddress newActor(Class<T> klass, String name, Object ... args);
 
-    <T extends Actor> ActorAddress restart(ActorAddress address);
+    ActorAddress restart(ActorAddress address, Message lostMessage, ActorAddress senderAddress);
 }

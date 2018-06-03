@@ -31,7 +31,7 @@ public class ActorSystemImpl implements ActorSystem {
     }
 
     @Override
-    public <T extends Actor> ActorAddress restart(ActorAddress address) {
+    public ActorAddress restart(ActorAddress address, Message lostMessage, ActorAddress senderAddress) {
         throw new UnsupportedOperationException("Actor system can not restart actors!");
     }
 }

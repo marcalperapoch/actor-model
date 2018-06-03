@@ -16,7 +16,9 @@ public final class RootSupervisor extends Actor {
                     failedMessage.getOriginalMessage(),
                     failedMessage.getDestinatary());
 
-            getContext().restart(failedMessage.getDestinatary());
+            getContext().restart(failedMessage.getDestinatary(),
+                    failedMessage.getOriginalMessage(),
+                    failedMessage.getFrom().orElse(null));
         }
     }
 

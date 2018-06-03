@@ -2,6 +2,8 @@ package com.perapoch.concurrency.core;
 
 import com.perapoch.concurrency.ActorAddress;
 
+import java.util.Optional;
+
 public class FailedMessage extends Message {
 
     private final Message originalMessage;
@@ -19,5 +21,10 @@ public class FailedMessage extends Message {
 
     public ActorAddress getDestinatary() {
         return toAddress;
+    }
+
+    @Override
+    public Optional<ActorAddress> getFrom() {
+        return originalMessage.getFrom();
     }
 }

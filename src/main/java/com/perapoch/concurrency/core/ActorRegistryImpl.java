@@ -20,7 +20,7 @@ public class ActorRegistryImpl implements ActorRegistry {
     @Override
     public void registerActor(final Actor actor) {
 
-        registry.compute(actor.getPath(), (address, oldActor) -> {
+        registry.compute(actor.getPath(), (path, oldActor) -> {
             if (oldActor == null) {
                 return actor;
             } else {
@@ -29,15 +29,6 @@ public class ActorRegistryImpl implements ActorRegistry {
             }
         });
     }
-
-    /*@Override
-    public void restart(String actorName) {
-        final ActorRecipe recipe = actorRecipes.get(actorName);
-        if (recipe != null) {
-            final ActorAddressImpl restartedActor = registerActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
-            //messageDispatcher.markAsHealthy(restartedActor); // TODO: review
-        }
-    }*/
 
 
 }

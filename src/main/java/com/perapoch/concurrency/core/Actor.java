@@ -43,9 +43,9 @@ public abstract class Actor {
     }
 
     void copyMessagesFrom(final Actor other) {
-        /*while (other.hasPendingMessages()) {
-            messageDispatcher.newMessage(actor, oldActor.getNextMessage());
-        }*/
+        while (other.hasPendingMessages()) {
+            enqueueMessage(other.getNextMessage());
+        }
     }
 
     ActorContext getContext() {
@@ -61,12 +61,12 @@ public abstract class Actor {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Actor actor = (Actor) o;
-        return Objects.equals(address, actor.address);
+        return Objects.equals(address.getPath(), actor.address.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(address);
+        return Objects.hash(address.getPath());
     }
 
 

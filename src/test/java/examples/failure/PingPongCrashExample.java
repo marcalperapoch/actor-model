@@ -12,15 +12,15 @@ public class PingPongCrashExample extends BaseExample {
 
     public void test() {
 
-        final ActorAddress ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger","pum!");
+        final ActorAddress ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger",5);
         final ActorAddress pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
 
         pinger.tell(new Message("start"));
 
-        final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        /*final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         service.schedule(() -> {
             ponger.tell(new Message("pum!"));
-        }, 10, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);*/
 
     }
 

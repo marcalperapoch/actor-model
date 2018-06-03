@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ActorContextImpl implements ActorContext {
@@ -43,18 +44,25 @@ public class ActorContextImpl implements ActorContext {
             final Class<?>[] types = toTypes(args);
             final Constructor<? extends Actor> ctr = ConstructorUtils.getMatchingAccessibleConstructor(klass, types);
             final Actor actor = ctr.newInstance(args);
-
-            return register(actor, name, args);
+            final ActorAddress address = register(actor, name, args);
+            messageDispatcher.onNewActor(actor);
+            return address;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public <T extends Actor> ActorAddress restart(ActorAddress address) {
+    public ActorAddress restart(ActorAddress address, Message lostMessage, ActorAddress senderAddress) {
         final Path path = address.getPath();
         final ActorRecipe recipe = actorRecipes.get(path);
-        return newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
+        final ActorAddress newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
+        if (senderAddress != null) {
+            newActor.tell(lostMessage, senderAddress);
+        } else {
+            newActor.tell(lostMessage);
+        }
+        return newActor;
     }
 
 
@@ -76,6 +84,19 @@ public class ActorContextImpl implements ActorContext {
 
     private Class<?>[] toTypes(Object ...  args) {
         return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ActorContextImpl that = (ActorContextImpl) o;
+        return Objects.equals(path, that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
     @Override
