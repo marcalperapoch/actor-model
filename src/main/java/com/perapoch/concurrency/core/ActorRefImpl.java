@@ -1,7 +1,6 @@
 package com.perapoch.concurrency.core;
 
-import com.perapoch.concurrency.ActorAddress;
-import com.perapoch.concurrency.ActorContext;
+import com.perapoch.concurrency.ActorRef;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 import java.lang.reflect.Constructor;
@@ -11,24 +10,35 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ActorContextImpl implements ActorContext {
+public final class ActorRefImpl implements ActorRef {
 
     private final Path path;
     private final MessageDispatcher messageDispatcher;
     private final ActorRegistry registry;
     private final Map<Path, ActorRecipe> actorRecipes;
+    private final String name;
 
-    public ActorContextImpl(final Path path,
-                            final MessageDispatcher messageDispatcher,
-                            final ActorRegistry registry) {
+    ActorRefImpl(final Path path,
+                 final MessageDispatcher messageDispatcher,
+                 final ActorRegistry registry) {
         this.path = path;
         this.messageDispatcher = messageDispatcher;
         this.registry = registry;
         this.actorRecipes = new ConcurrentHashMap<>();
+        this.name = (path.getNameCount() > 0) ? path.getName(path.getNameCount() - 1).toString() : "root";
     }
 
     @Override
-    public void tell(ActorAddress to, Message msg, ActorAddress from) {
+    public void tell(Message msg, ActorRef from) {
+        tell(this, msg, from);
+    }
+
+    @Override
+    public void tell(Message msg) {
+        tell(this, msg, NO_SENDER);
+    }
+
+    private void tell(ActorRef to, Message msg, ActorRef from) {
         msg.setFrom(from);
         messageDispatcher.newMessage(registry.getActorByAddress(to), msg);
     }
@@ -39,12 +49,12 @@ public class ActorContextImpl implements ActorContext {
     }
 
     @Override
-    public <T extends Actor> ActorAddress newActor(Class<T> klass, String name, Object... args) {
+    public <T extends Actor> ActorRef newActor(Class<T> klass, String name, Object... args) {
         try {
             final Class<?>[] types = toTypes(args);
             final Constructor<? extends Actor> ctr = ConstructorUtils.getMatchingAccessibleConstructor(klass, types);
             final Actor actor = ctr.newInstance(args);
-            final ActorAddress address = register(actor, name, args);
+            final ActorRef address = register(actor, name, args);
             messageDispatcher.onNewActor(actor);
             return address;
         } catch (Exception e) {
@@ -53,10 +63,10 @@ public class ActorContextImpl implements ActorContext {
     }
 
     @Override
-    public ActorAddress restart(ActorAddress address, Message lostMessage, ActorAddress senderAddress) {
+    public ActorRef restart(ActorRef address, Message lostMessage, ActorRef senderAddress) {
         final Path path = address.getPath();
         final ActorRecipe recipe = actorRecipes.get(path);
-        final ActorAddress newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
+        final ActorRef newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
         if (senderAddress != null) {
             newActor.tell(lostMessage, senderAddress);
         } else {
@@ -66,20 +76,20 @@ public class ActorContextImpl implements ActorContext {
     }
 
 
-    private ActorAddress register(Actor actor, String name, Object[] args) {
-        final ActorAddress actorAddress = createNewAddress(name);
-        actor.setAddress(actorAddress);
+    private ActorRef register(Actor actor, String name, Object[] args) {
+        final ActorRef actorRef = createNewAddress(name);
+        actor.setActorRef(actorRef);
 
-        actorRecipes.computeIfAbsent(actorAddress.getPath(), path ->  new ActorRecipe(actor.getClass(), name, args));
+        actorRecipes.computeIfAbsent(actorRef.getPath(), path ->  new ActorRecipe(actor.getClass(), name, args));
 
         registry.registerActor(actor);
 
-        return actorAddress;
+        return actorRef;
     }
 
-    private ActorAddress createNewAddress(String name) {
+    private ActorRef createNewAddress(String name) {
         final Path newPath = path.resolve(name);
-        return new ActorAddressImpl(new ActorContextImpl(newPath, messageDispatcher, registry));
+        return new ActorRefImpl(newPath, messageDispatcher, registry);
     }
 
     private Class<?>[] toTypes(Object ...  args) {
@@ -90,8 +100,8 @@ public class ActorContextImpl implements ActorContext {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ActorContextImpl that = (ActorContextImpl) o;
-        return Objects.equals(path, that.path);
+        ActorRefImpl actorRef = (ActorRefImpl) o;
+        return Objects.equals(path, actorRef.path);
     }
 
     @Override
@@ -101,8 +111,9 @@ public class ActorContextImpl implements ActorContext {
 
     @Override
     public String toString() {
-        return "ActorContextImpl{" +
+        return "ActorRefImpl{" +
                 "path=" + path +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

@@ -1,7 +1,6 @@
 package com.perapoch.concurrency.core;
 
-import com.perapoch.concurrency.ActorContext;
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.ActorSystem;
 
 import java.nio.file.Paths;
@@ -10,14 +9,14 @@ public class ActorSystemImpl implements ActorSystem {
 
     private final MessageDispatcher messageDispatcher;
     private final ActorRegistry actorRegistry;
-    private final ActorContext baseContext;
-    private final ActorAddress rootSupervisor;
+    private final ActorRef systemRef;
+    private final ActorRef rootSupervisor;
 
     public ActorSystemImpl(int numThreads) {
         this.actorRegistry = new ActorRegistryImpl();
         this.messageDispatcher = new MessageDispatcher(actorRegistry, numThreads);
-        this.baseContext = new ActorContextImpl(Paths.get("/"), messageDispatcher, actorRegistry);
-        this.rootSupervisor = baseContext.newActor(RootSupervisor.class, "root");
+        this.systemRef = new ActorRefImpl(Paths.get("/"), messageDispatcher, actorRegistry);
+        this.rootSupervisor = systemRef.newActor(RootSupervisor.class, "root");
     }
 
     @Override
@@ -26,12 +25,12 @@ public class ActorSystemImpl implements ActorSystem {
     }
 
     @Override
-    public <T extends Actor> ActorAddress newActor(Class<T> klass, String name, Object... args) {
-        return rootSupervisor.getContext().newActor(klass, name, args);
+    public <T extends Actor> ActorRef newActor(Class<T> klass, String name, Object... args) {
+        return rootSupervisor.newActor(klass, name, args);
     }
 
     @Override
-    public ActorAddress restart(ActorAddress address, Message lostMessage, ActorAddress senderAddress) {
+    public ActorRef restart(ActorRef address, Message lostMessage, ActorRef senderAddress) {
         throw new UnsupportedOperationException("Actor system can not restart actors!");
     }
 }

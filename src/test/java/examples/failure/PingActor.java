@@ -1,6 +1,6 @@
 package examples.failure;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
 import org.slf4j.Logger;
@@ -14,9 +14,9 @@ import static examples.TestUtils.sleep;
 public class PingActor extends Actor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PingActor.class);
-    private final ActorAddress ponger;
+    private final ActorRef ponger;
 
-    public PingActor(ActorAddress ponger) {
+    public PingActor(ActorRef ponger) {
         this.ponger = ponger;
     }
 

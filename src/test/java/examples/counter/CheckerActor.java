@@ -1,6 +1,6 @@
 package examples.counter;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
 import org.slf4j.Logger;
@@ -10,9 +10,9 @@ public class CheckerActor extends Actor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckerActor.class);
 
-    private final ActorAddress counter;
+    private final ActorRef counter;
 
-    public CheckerActor(ActorAddress counter) {
+    public CheckerActor(ActorRef counter) {
         this.counter = counter;
     }
 

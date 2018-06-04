@@ -1,6 +1,6 @@
 package examples.counter;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Message;
 import examples.BaseExample;
 import org.slf4j.Logger;
@@ -21,8 +21,8 @@ public class CounterExample extends BaseExample {
 
     @Override
     public void test() {
-        final ActorAddress counter = actorSystem.newActor(CounterActor.class, "counter");
-        final ActorAddress checker = actorSystem.newActor(CheckerActor.class, "checker", counter);
+        final ActorRef counter = actorSystem.newActor(CounterActor.class, "counter");
+        final ActorRef checker = actorSystem.newActor(CheckerActor.class, "checker", counter);
 
         final ExecutorService service = Executors.newFixedThreadPool(NUM_THREADS);
         final CompletableFuture[] futures = new CompletableFuture[NUM_THREADS];
@@ -51,10 +51,10 @@ public class CounterExample extends BaseExample {
 
     private static class Incrementer implements Runnable {
 
-        private final ActorAddress counter;
+        private final ActorRef counter;
         private final String name;
 
-        private Incrementer(ActorAddress counter, int index) {
+        private Incrementer(ActorRef counter, int index) {
             this.counter = counter;
             this.name = "Incrementor[" + index + "]";
         }

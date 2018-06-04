@@ -1,6 +1,6 @@
 package examples.senderreceiver;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
 import org.slf4j.Logger;
@@ -11,9 +11,9 @@ public class SenderActor extends Actor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SenderActor.class);
     private static final int MAGIC_NUMBER = 43;
 
-    private final ActorAddress consumer;
+    private final ActorRef consumer;
 
-    public SenderActor(ActorAddress consumer) {
+    public SenderActor(ActorRef consumer) {
         this.consumer = consumer;
     }
 

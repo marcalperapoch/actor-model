@@ -89,7 +89,7 @@ public class MessageDispatcher extends Thread {
                             final Path parentPath = path.getParent();
                             if (parentPath != null && !"/".equals(parentPath)) { // not the root actor
                                 final Actor parentActor = registry.getActorByPath(parentPath);
-                                parentActor.getAddress().tell(new FailedMessage("Not delivered message", msg, actor.getAddress()));
+                                parentActor.getActorRef().tell(new FailedMessage("Not delivered message", msg, actor.getActorRef()));
                             }
                         }
                     });

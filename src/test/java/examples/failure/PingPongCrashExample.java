@@ -1,19 +1,17 @@
 package examples.failure;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Message;
 import examples.BaseExample;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 public class PingPongCrashExample extends BaseExample {
 
     public void test() {
 
-        final ActorAddress ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger",5);
-        final ActorAddress pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
+        final ActorRef ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger",5);
+        final ActorRef pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
 
         pinger.tell(new Message("start"));
 
@@ -24,7 +22,8 @@ public class PingPongCrashExample extends BaseExample {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        //System.in.read();
         new PingPongCrashExample().test();
     }
 }

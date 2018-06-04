@@ -1,13 +1,13 @@
 package com.perapoch.concurrency.core;
 
-import com.perapoch.concurrency.ActorAddress;
+import com.perapoch.concurrency.ActorRef;
 
 import java.util.Objects;
 import java.util.Optional;
 
 public class Message {
 
-    private ActorAddress from;
+    private ActorRef from;
     private String value;
 
     public Message(String value) {
@@ -18,11 +18,11 @@ public class Message {
         this.value = String.valueOf(number);
     }
 
-    public Optional<ActorAddress> getFrom() {
+    public Optional<ActorRef> getFrom() {
         return Optional.ofNullable(from);
     }
 
-    public void setFrom(ActorAddress from) {
+    public void setFrom(ActorRef from) {
         this.from = from;
     }
 

@@ -1,7 +1,6 @@
 package com.perapoch.concurrency.core;
 
-import com.perapoch.concurrency.ActorAddress;
-import com.perapoch.concurrency.ActorContext;
+import com.perapoch.concurrency.ActorRef;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -10,7 +9,7 @@ public abstract class Actor {
 
     private final Mailbox mailbox;
 
-    private ActorAddress address;
+    private ActorRef actorRef;
 
     public Actor() {
         this.mailbox = new Mailbox();
@@ -18,15 +17,15 @@ public abstract class Actor {
 
     protected abstract void onReceive(Message msg);
 
-    void setAddress(ActorAddress address) {
-        this.address = address;
+    void setActorRef(ActorRef actorRef) {
+        this.actorRef = actorRef;
     }
 
-    protected ActorAddress self() {
-        return address;
+    protected ActorRef self() {
+        return actorRef;
     }
 
-    ActorAddress getAddress() {
+    ActorRef getActorRef() {
         return self();
     }
 
@@ -48,12 +47,12 @@ public abstract class Actor {
         }
     }
 
-    ActorContext getContext() {
-        return address.getContext();
+    ActorRef getContext() {
+        return actorRef;
     }
 
     Path getPath() {
-        return getContext().getPath();
+        return actorRef.getPath();
     }
 
     @Override
@@ -61,12 +60,12 @@ public abstract class Actor {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Actor actor = (Actor) o;
-        return Objects.equals(address.getPath(), actor.address.getPath());
+        return Objects.equals(actorRef.getPath(), actor.actorRef.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(address.getPath());
+        return Objects.hash(actorRef.getPath());
     }
 
 
