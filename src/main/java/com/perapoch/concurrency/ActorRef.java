@@ -30,7 +30,7 @@ public interface ActorRef extends ActorFactory {
         }
 
         @Override
-        public Path getPath() {
+        public Path getAddress() {
             return null;
         }
 
@@ -40,5 +40,5 @@ public interface ActorRef extends ActorFactory {
 
     void tell(Message msg);
 
-    Path getPath();
+    Path getAddress();
 }

@@ -7,7 +7,7 @@ import java.nio.file.Path;
 public interface ActorRegistry {
 
     default Actor getActorByAddress(ActorRef address) {
-        return getActorByPath(address.getPath());
+        return getActorByPath(address.getAddress());
     }
 
     Actor getActorByPath(Path path);

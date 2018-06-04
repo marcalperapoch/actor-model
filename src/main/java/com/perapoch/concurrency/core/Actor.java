@@ -52,7 +52,7 @@ public abstract class Actor {
     }
 
     Path getPath() {
-        return actorRef.getPath();
+        return actorRef.getAddress();
     }
 
     @Override
@@ -60,12 +60,12 @@ public abstract class Actor {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Actor actor = (Actor) o;
-        return Objects.equals(actorRef.getPath(), actor.actorRef.getPath());
+        return Objects.equals(actorRef.getAddress(), actor.actorRef.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(actorRef.getPath());
+        return Objects.hash(actorRef.getAddress());
     }
 
 

@@ -12,20 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class ActorRefImpl implements ActorRef {
 
-    private final Path path;
+    private final Path address;
     private final MessageDispatcher messageDispatcher;
     private final ActorRegistry registry;
     private final Map<Path, ActorRecipe> actorRecipes;
     private final String name;
 
-    ActorRefImpl(final Path path,
+    ActorRefImpl(final Path address,
                  final MessageDispatcher messageDispatcher,
                  final ActorRegistry registry) {
-        this.path = path;
+        this.address = address;
         this.messageDispatcher = messageDispatcher;
         this.registry = registry;
         this.actorRecipes = new ConcurrentHashMap<>();
-        this.name = (path.getNameCount() > 0) ? path.getName(path.getNameCount() - 1).toString() : "root";
+        this.name = (address.getNameCount() > 0) ? address.getName(address.getNameCount() - 1).toString() : "root";
     }
 
     @Override
@@ -44,8 +44,8 @@ public final class ActorRefImpl implements ActorRef {
     }
 
     @Override
-    public Path getPath() {
-        return path;
+    public Path getAddress() {
+        return address;
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class ActorRefImpl implements ActorRef {
 
     @Override
     public ActorRef restart(ActorRef address, Message lostMessage, ActorRef senderAddress) {
-        final Path path = address.getPath();
+        final Path path = address.getAddress();
         final ActorRecipe recipe = actorRecipes.get(path);
         final ActorRef newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
         if (senderAddress != null) {
@@ -80,7 +80,7 @@ public final class ActorRefImpl implements ActorRef {
         final ActorRef actorRef = createNewAddress(name);
         actor.setActorRef(actorRef);
 
-        actorRecipes.computeIfAbsent(actorRef.getPath(), path ->  new ActorRecipe(actor.getClass(), name, args));
+        actorRecipes.computeIfAbsent(actorRef.getAddress(), path ->  new ActorRecipe(actor.getClass(), name, args));
 
         registry.registerActor(actor);
 
@@ -88,7 +88,7 @@ public final class ActorRefImpl implements ActorRef {
     }
 
     private ActorRef createNewAddress(String name) {
-        final Path newPath = path.resolve(name);
+        final Path newPath = address.resolve(name);
         return new ActorRefImpl(newPath, messageDispatcher, registry);
     }
 
@@ -101,18 +101,18 @@ public final class ActorRefImpl implements ActorRef {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ActorRefImpl actorRef = (ActorRefImpl) o;
-        return Objects.equals(path, actorRef.path);
+        return Objects.equals(address, actorRef.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path);
+        return Objects.hash(address);
     }
 
     @Override
     public String toString() {
         return "ActorRefImpl{" +
-                "path=" + path +
+                "address=" + address +
                 ", name='" + name + '\'' +
                 '}';
     }
