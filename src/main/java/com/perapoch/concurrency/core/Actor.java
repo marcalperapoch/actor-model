@@ -2,7 +2,6 @@ package com.perapoch.concurrency.core;
 
 import com.perapoch.concurrency.ActorRef;
 
-import java.nio.file.Path;
 import java.util.Objects;
 
 public abstract class Actor {
@@ -51,7 +50,7 @@ public abstract class Actor {
         return actorRef;
     }
 
-    Path getPath() {
+    ActorAddress getAddress() {
         return actorRef.getAddress();
     }
 

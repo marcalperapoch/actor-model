@@ -8,17 +8,14 @@ import java.io.IOException;
 
 public class PingPongCrashExample extends BaseExample {
 
+    private static final int FAILING_PERCENTAGE = 20;
+
     public void test() {
 
-        final ActorRef ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger",5);
+        final ActorRef ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger", FAILING_PERCENTAGE);
         final ActorRef pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
 
         pinger.tell(new Message("start"));
-
-        /*final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        service.schedule(() -> {
-            ponger.tell(new Message("pum!"));
-        }, 10, TimeUnit.SECONDS);*/
 
     }
 

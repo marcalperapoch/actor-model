@@ -4,7 +4,6 @@ import com.perapoch.concurrency.ActorRef;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 import java.lang.reflect.Constructor;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -12,20 +11,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class ActorRefImpl implements ActorRef {
 
-    private final Path address;
+    private final ActorAddress address;
     private final MessageDispatcher messageDispatcher;
     private final ActorRegistry registry;
-    private final Map<Path, ActorRecipe> actorRecipes;
-    private final String name;
+    private final Map<ActorAddress, ActorRecipe> actorRecipes;
 
-    ActorRefImpl(final Path address,
+    ActorRefImpl(final ActorAddress address,
                  final MessageDispatcher messageDispatcher,
                  final ActorRegistry registry) {
         this.address = address;
         this.messageDispatcher = messageDispatcher;
         this.registry = registry;
         this.actorRecipes = new ConcurrentHashMap<>();
-        this.name = (address.getNameCount() > 0) ? address.getName(address.getNameCount() - 1).toString() : "root";
     }
 
     @Override
@@ -40,11 +37,11 @@ public final class ActorRefImpl implements ActorRef {
 
     private void tell(ActorRef to, Message msg, ActorRef from) {
         msg.setFrom(from);
-        messageDispatcher.newMessage(registry.getActorByAddress(to), msg);
+        messageDispatcher.newMessage(registry.getActorByActorRef(to), msg);
     }
 
     @Override
-    public Path getAddress() {
+    public ActorAddress getAddress() {
         return address;
     }
 
@@ -64,7 +61,7 @@ public final class ActorRefImpl implements ActorRef {
 
     @Override
     public ActorRef restart(ActorRef address, Message lostMessage, ActorRef senderAddress) {
-        final Path path = address.getAddress();
+        final ActorAddress path = address.getAddress();
         final ActorRecipe recipe = actorRecipes.get(path);
         final ActorRef newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
         if (senderAddress != null) {
@@ -88,8 +85,8 @@ public final class ActorRefImpl implements ActorRef {
     }
 
     private ActorRef createNewAddress(String name) {
-        final Path newPath = address.resolve(name);
-        return new ActorRefImpl(newPath, messageDispatcher, registry);
+        final ActorAddress newAddress = ActorAddress.of(address, name);
+        return new ActorRefImpl(newAddress, messageDispatcher, registry);
     }
 
     private Class<?>[] toTypes(Object ...  args) {
@@ -113,7 +110,6 @@ public final class ActorRefImpl implements ActorRef {
     public String toString() {
         return "ActorRefImpl{" +
                 "address=" + address +
-                ", name='" + name + '\'' +
                 '}';
     }
 }

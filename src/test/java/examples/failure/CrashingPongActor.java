@@ -10,16 +10,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import static examples.TestUtils.sleep;
+import static java.lang.String.format;
 
 public class CrashingPongActor extends Actor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CrashingPongActor.class);
-    private final int failingMultiple;
+    private final int failingBoundary;
 
     private int totalPings;
 
-    public CrashingPongActor(int failingMultiple) {
-        this.failingMultiple = failingMultiple;
+    public CrashingPongActor(int failingBoundary) {
+        this.failingBoundary = failingBoundary;
         this.totalPings = 1;
     }
 
@@ -27,8 +28,9 @@ public class CrashingPongActor extends Actor {
     @Override
     protected void onReceive(Message msg) {
         LOGGER.info("Got {} message ({} pings so far)", msg.getValue(), totalPings);
-        if (totalPings % failingMultiple == 0) {
-            throw new IllegalArgumentException("Time to crash " + msg.getValue() + " is multiple of " + failingMultiple);
+        final int randomNum = ThreadLocalRandom.current().nextInt(0, 100);
+        if (randomNum < failingBoundary) {
+            throw new IllegalArgumentException(format("Time to crash for message %s. Random %d, Boundary %d", msg.getValue(), randomNum, failingBoundary));
         } else {
             ++totalPings;
             sleep(ThreadLocalRandom.current().nextInt(500, 2000), TimeUnit.MILLISECONDS);

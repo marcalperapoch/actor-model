@@ -3,8 +3,6 @@ package com.perapoch.concurrency.core;
 import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.ActorSystem;
 
-import java.nio.file.Paths;
-
 public class ActorSystemImpl implements ActorSystem {
 
     private final MessageDispatcher messageDispatcher;
@@ -15,7 +13,7 @@ public class ActorSystemImpl implements ActorSystem {
     public ActorSystemImpl(int numThreads) {
         this.actorRegistry = new ActorRegistryImpl();
         this.messageDispatcher = new MessageDispatcher(actorRegistry, numThreads);
-        this.systemRef = new ActorRefImpl(Paths.get("/"), messageDispatcher, actorRegistry);
+        this.systemRef = new ActorRefImpl(ActorAddress.rootAddress(), messageDispatcher, actorRegistry);
         this.rootSupervisor = systemRef.newActor(RootSupervisor.class, "root");
     }
 

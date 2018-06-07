@@ -1,9 +1,8 @@
 package com.perapoch.concurrency;
 
 import com.perapoch.concurrency.core.Actor;
+import com.perapoch.concurrency.core.ActorAddress;
 import com.perapoch.concurrency.core.Message;
-
-import java.nio.file.Path;
 
 public interface ActorRef extends ActorFactory {
 
@@ -30,7 +29,7 @@ public interface ActorRef extends ActorFactory {
         }
 
         @Override
-        public Path getAddress() {
+        public ActorAddress getAddress() {
             return null;
         }
 
@@ -40,5 +39,5 @@ public interface ActorRef extends ActorFactory {
 
     void tell(Message msg);
 
-    Path getAddress();
+    ActorAddress getAddress();
 }

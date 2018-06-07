@@ -49,7 +49,7 @@ public class MessageDispatcher extends Thread {
 
     void onNewActor(final Actor actor) {
         runningActors.putIfAbsent(actor, false);
-        LOGGER.info("*** New actor \"{}\". Total actors = {}", actor.getPath(), runningActors.size());
+        LOGGER.info("*** New actor \"{}\". Total actors = {}", actor.getAddress(), runningActors.size());
     }
 
     @Override
@@ -85,12 +85,11 @@ public class MessageDispatcher extends Thread {
                         } catch (Exception ex) {
                             LOGGER.error("Process message error", ex);
                             runningActors.remove(actor);
-                            final Path path = actor.getPath();
-                            final Path parentPath = path.getParent();
-                            if (parentPath != null && !"/".equals(parentPath)) { // not the root actor
-                                final Actor parentActor = registry.getActorByPath(parentPath);
+                            final ActorAddress address = actor.getAddress();
+                            address.getParentAddress().ifPresent(parentAddress -> {
+                                final Actor parentActor = registry.getActorByAddress(parentAddress);
                                 parentActor.getActorRef().tell(new FailedMessage("Not delivered message", msg, actor.getActorRef()));
-                            }
+                            });
                         }
                     });
 

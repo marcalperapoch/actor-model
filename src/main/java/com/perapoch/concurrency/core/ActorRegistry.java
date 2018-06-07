@@ -6,11 +6,11 @@ import java.nio.file.Path;
 
 public interface ActorRegistry {
 
-    default Actor getActorByAddress(ActorRef address) {
-        return getActorByPath(address.getAddress());
+    default Actor getActorByActorRef(ActorRef address) {
+        return getActorByAddress(address.getAddress());
     }
 
-    Actor getActorByPath(Path path);
+    Actor getActorByAddress(ActorAddress address);
 
     void registerActor(Actor actor);
 }
