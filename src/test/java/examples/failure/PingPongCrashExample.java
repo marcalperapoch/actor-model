@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class PingPongCrashExample extends BaseExample {
 
-    private static final int FAILING_PERCENTAGE = 20;
+    private static final int FAILING_PERCENTAGE = 30;
 
     public void test() {
 

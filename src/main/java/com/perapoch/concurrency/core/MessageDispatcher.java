@@ -57,41 +57,39 @@ public class MessageDispatcher extends Thread {
         try {
             while (true) {
 
-                final Map<Actor, Message> actorsToRun = new HashMap<>();
-
                 final ReentrantLock lock = this.lock;
                 lock.lockInterruptibly();
                 try {
                     while (pendingMessages.get() == 0) {
                         notFull.await();
                     }
-                    runningActors.forEach((actor, consuming) -> {
-                        if (!consuming && actor.hasPendingMessages()) {
-                            runningActors.put(actor, true);
-                            actorsToRun.put(actor, actor.getNextMessage());
-                        }
-                    });
                 } finally {
                     lock.unlock();
                 }
 
-                actorsToRun.forEach((actor, msg) -> {
+                runningActors.forEach((actor, consuming) -> {
 
-                    executorService.submit(() -> {
-                        try {
-                            actor.onReceive(msg);
-                            pendingMessages.decrementAndGet();
-                            runningActors.put(actor, false);
-                        } catch (Exception ex) {
-                            LOGGER.error("Process message error", ex);
-                            runningActors.remove(actor);
-                            final ActorAddress address = actor.getAddress();
-                            address.getParentAddress().ifPresent(parentAddress -> {
-                                final Actor parentActor = registry.getActorByAddress(parentAddress);
-                                parentActor.getActorRef().tell(new FailedMessage("Not delivered message", msg, actor.getActorRef()));
+                    if (!consuming && actor.hasPendingMessages()) {
+                        final Message message = actor.getNextMessage();
+                        if (message != null) {
+                            runningActors.put(actor, true);
+                            executorService.submit(() -> {
+                                try {
+                                    actor.onReceive(message);
+                                    pendingMessages.decrementAndGet();
+                                    runningActors.put(actor, false);
+                                } catch (Exception ex) {
+                                    LOGGER.error("Process message error", ex);
+                                    runningActors.remove(actor);
+                                    final ActorAddress address = actor.getAddress();
+                                    address.getParentAddress().ifPresent(parentAddress -> {
+                                        final Actor parentActor = registry.getActorByAddress(parentAddress);
+                                        parentActor.getActorRef().tell(new FailedMessage("Not delivered message", message, actor.getActorRef()));
+                                    });
+                                }
                             });
                         }
-                    });
+                    }
 
                 });
 
