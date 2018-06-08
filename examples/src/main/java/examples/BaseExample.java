@@ -2,7 +2,6 @@ package examples;
 
 import com.perapoch.concurrency.ActorSystem;
 import com.perapoch.concurrency.core.ActorSystemImpl;
-import sun.tools.java.Environment;
 
 public abstract class BaseExample {
 

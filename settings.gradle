@@ -1,2 +1,4 @@
 rootProject.name = 'actor-model'
+include 'actor-model-system'
+include 'examples'
 
