@@ -79,12 +79,13 @@ public class MessageDispatcher extends Thread {
                                     pendingMessages.decrementAndGet();
                                     runningActors.put(actor, false);
                                 } catch (Exception ex) {
-                                    LOGGER.error("Process message error", ex);
+                                    LOGGER.error("Couldn't deliver {} to {} ({})", message, actor, ex.getMessage());
                                     runningActors.remove(actor);
                                     final ActorAddress address = actor.getAddress();
                                     address.getParentAddress().ifPresent(parentAddress -> {
                                         final Actor parentActor = registry.getActorByAddress(parentAddress);
-                                        parentActor.getActorRef().tell(new FailedMessage("Not delivered message", message, actor.getActorRef()));
+                                        parentActor.getActorRef()
+                                                .tell(new FailedMessage(message, actor.getActorRef()), message.getFrom());
                                     });
                                 }
                             });

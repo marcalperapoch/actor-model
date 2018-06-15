@@ -11,7 +11,7 @@ public class SenderReceiverExample extends BaseExample {
         final ActorRef receiverActor = actorSystem.newActor(ReceiverActor.class, "receiver");
         final ActorRef senderActor = actorSystem.newActor(SenderActor.class, "sender", receiverActor);
 
-        senderActor.tell(new Message("start"));
+        senderActor.tell("start");
     }
 
     public static void main(String[] args) {

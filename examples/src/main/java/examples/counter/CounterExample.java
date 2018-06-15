@@ -17,7 +17,7 @@ public class CounterExample extends BaseExample {
     private static final int MESSAGES_TO_SEND = 10000;
     private static final int NUM_THREADS = 4;
     private static final int MESSAGE_PER_THREAD = MESSAGES_TO_SEND / NUM_THREADS;
-    private static final Message INCREMENT_MSG = new Message("inc");
+    private static final String INCREMENT_MSG = "inc";
 
     @Override
     public void test() {
@@ -33,7 +33,7 @@ public class CounterExample extends BaseExample {
 
             CompletableFuture.allOf(futures).get();
 
-            checker.tell(new Message("ask"));
+            checker.tell("ask");
 
         } catch (Exception e) {
            throw new RuntimeException(e);

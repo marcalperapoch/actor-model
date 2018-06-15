@@ -1,7 +1,9 @@
 package examples.failure;
 
+import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
+import com.perapoch.concurrency.core.MessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,16 +27,22 @@ public class CrashingPongActor extends Actor {
     }
 
 
-    @Override
-    protected void onReceive(Message msg) {
-        LOGGER.info("Got {} message ({} pings so far)", msg.getValue(), totalPings);
+    private void onReceive(String msg, ActorRef sender) {
+        LOGGER.info("Got {} message ({} pings so far)", msg, totalPings);
         final int randomNum = ThreadLocalRandom.current().nextInt(0, 100);
         if (randomNum < failingBoundary) {
-            throw new IllegalArgumentException(format("Time to crash for message %s. Random %d, Boundary %d", msg.getValue(), randomNum, failingBoundary));
+            throw new IllegalArgumentException(format("Time to crash for message %s. Random %d, Boundary %d", msg, randomNum, failingBoundary));
         } else {
             ++totalPings;
             sleep(ThreadLocalRandom.current().nextInt(500, 2000), TimeUnit.MILLISECONDS);
-            msg.getFrom().ifPresent(sender -> sender.tell(new Message("pong")));
+           sender.tell("pong");
         }
+    }
+
+    @Override
+    protected MessageHandler createMessageHandler() {
+        return MessageHandler.builder()
+                .withHandler(String.class, this::onReceive)
+                .build();
     }
 }

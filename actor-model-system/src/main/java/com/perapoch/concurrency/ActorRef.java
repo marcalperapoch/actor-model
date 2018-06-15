@@ -19,12 +19,12 @@ public interface ActorRef extends ActorFactory {
         }
 
         @Override
-        public void tell(Message msg, ActorRef from) {
+        public <T> void tell(T msg, ActorRef from) {
             throw new UnsupportedOperationException("You can not send msg to a no sender address");
         }
 
         @Override
-        public void tell(Message msg) {
+        public <T> void tell(T msg) {
             throw new UnsupportedOperationException("You can not send msg to a no sender address");
         }
 
@@ -35,9 +35,9 @@ public interface ActorRef extends ActorFactory {
 
     };
 
-    void tell(Message msg, ActorRef from);
+    <T> void tell(T msg, ActorRef from);
 
-    void tell(Message msg);
+    <T> void tell(T msg);
 
     ActorAddress getAddress();
 }

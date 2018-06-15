@@ -3,6 +3,7 @@ package examples.failure;
 import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
+import com.perapoch.concurrency.core.MessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,16 +21,22 @@ public class PingActor extends Actor {
         this.ponger = ponger;
     }
 
-    @Override
-    protected void onReceive(Message msg) {
-        if ("start".equals(msg.getValue())) {
-            LOGGER.info("Got {} message. Starting to play...", msg.getValue());
+    private void onReceive(String msg, ActorRef sender) {
+        if ("start".equals(msg)) {
+            LOGGER.info("Got {} message. Starting to play...", msg);
         } else {
-            LOGGER.info("Got {} from ponger", msg.getValue());
+            LOGGER.info("Got {} from ponger", msg);
         }
 
         sleep(ThreadLocalRandom.current().nextInt(500, 2000), TimeUnit.MILLISECONDS);
 
-        ponger.tell(new Message("ping"), self());
+        ponger.tell("ping", self());
+    }
+
+    @Override
+    protected MessageHandler createMessageHandler() {
+        return MessageHandler.builder()
+                .withHandler(String.class, this::onReceive)
+                .build();
     }
 }

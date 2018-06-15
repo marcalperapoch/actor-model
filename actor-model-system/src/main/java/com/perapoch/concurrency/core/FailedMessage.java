@@ -4,13 +4,12 @@ import com.perapoch.concurrency.ActorRef;
 
 import java.util.Optional;
 
-public class FailedMessage extends Message {
+public class FailedMessage {
 
     private final Message originalMessage;
     private final ActorRef toAddress;
 
-    public FailedMessage(String value, Message original, ActorRef to) {
-        super(value);
+    public FailedMessage(Message original, ActorRef to) {
         this.originalMessage = original;
         this.toAddress = to;
     }
@@ -21,10 +20,5 @@ public class FailedMessage extends Message {
 
     public ActorRef getDestinatary() {
         return toAddress;
-    }
-
-    @Override
-    public Optional<ActorRef> getFrom() {
-        return originalMessage.getFrom();
     }
 }

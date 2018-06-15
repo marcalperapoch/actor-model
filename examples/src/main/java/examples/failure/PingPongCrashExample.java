@@ -15,7 +15,7 @@ public class PingPongCrashExample extends BaseExample {
         final ActorRef ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger", FAILING_PERCENTAGE);
         final ActorRef pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
 
-        pinger.tell(new Message("start"));
+        pinger.tell("start");
 
     }
 

@@ -3,6 +3,7 @@ package examples.senderreceiver;
 import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.Message;
+import com.perapoch.concurrency.core.MessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,16 +18,22 @@ public class SenderActor extends Actor {
         this.consumer = consumer;
     }
 
-    @Override
-    protected void onReceive(Message msg) {
-        LOGGER.info("SenderActor has received a {} message!", msg.getValue());
-        if ("start".equals(msg.getValue())) {
+    protected void onReceive(String msg, ActorRef sender) {
+        LOGGER.info("SenderActor has received a {} message!", msg);
+        if ("start".equals(msg)) {
 
-            consumer.tell(new Message("hello from Sender"), self());
+            consumer.tell("hello from Sender", self());
 
-        } else if ("hello from Receiver".equals(msg.getValue())) {
+        } else if ("hello from Receiver".equals(msg)) {
 
-            consumer.tell(new Message(MAGIC_NUMBER), self());
+            consumer.tell(MAGIC_NUMBER, self());
         }
+    }
+
+    @Override
+    protected MessageHandler createMessageHandler() {
+        return MessageHandler.builder()
+                .withHandler(String.class, this::onReceive)
+                .build();
     }
 }

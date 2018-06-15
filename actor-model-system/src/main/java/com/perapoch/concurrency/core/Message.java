@@ -5,29 +5,28 @@ import com.perapoch.concurrency.ActorRef;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Message {
+public class Message<T> {
 
-    private ActorRef from;
-    private String value;
+    private final ActorRef from;
+    private final T value;
+    private final Class<T> messageType;
 
-    public Message(String value) {
+    public Message(T value, ActorRef from) {
         this.value = value;
-    }
-
-    public Message(Integer number) {
-        this.value = String.valueOf(number);
-    }
-
-    public Optional<ActorRef> getFrom() {
-        return Optional.ofNullable(from);
-    }
-
-    public void setFrom(ActorRef from) {
+        this.messageType = (Class<T>) value.getClass();
         this.from = from;
     }
 
-    public String getValue() {
+    public ActorRef getFrom() {
+        return from;
+    }
+
+    public T getValue() {
         return value;
+    }
+
+    public Class<T> getMessageType() {
+        return messageType;
     }
 
     @Override

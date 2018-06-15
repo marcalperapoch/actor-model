@@ -3,18 +3,25 @@ package com.perapoch.concurrency.core;
 import com.perapoch.concurrency.ActorRef;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class Actor {
 
     private final Mailbox mailbox;
+    private final MessageHandler messageHandler;
 
     private ActorRef actorRef;
 
     public Actor() {
         this.mailbox = new Mailbox();
+        this.messageHandler = createMessageHandler();
     }
 
-    protected abstract void onReceive(Message msg);
+    protected abstract MessageHandler createMessageHandler();
+
+    <T> void onReceive(Message<T> msg) {
+        messageHandler.handle(msg);
+    }
 
     void setActorRef(ActorRef actorRef) {
         this.actorRef = actorRef;

@@ -26,18 +26,18 @@ public final class ActorRefImpl implements ActorRef {
     }
 
     @Override
-    public void tell(Message msg, ActorRef from) {
+    public <T> void tell(T msg, ActorRef from) {
         tell(this, msg, from);
     }
 
     @Override
-    public void tell(Message msg) {
+    public <T> void tell(T msg) {
         tell(this, msg, NO_SENDER);
     }
 
-    private void tell(ActorRef to, Message msg, ActorRef from) {
-        msg.setFrom(from);
-        messageDispatcher.newMessage(registry.getActorByActorRef(to), msg);
+    private <T> void tell(ActorRef to, T msg, ActorRef from) {
+        final Message<T> message = new Message<>(msg, from);
+        messageDispatcher.newMessage(registry.getActorByActorRef(to), message);
     }
 
     @Override
@@ -65,9 +65,9 @@ public final class ActorRefImpl implements ActorRef {
         final ActorRecipe recipe = actorRecipes.get(path);
         final ActorRef newActor = newActor(recipe.getKlass(), recipe.getName(), recipe.getArgs());
         if (senderAddress != null) {
-            newActor.tell(lostMessage, senderAddress);
+            newActor.tell(lostMessage.getValue(), senderAddress);
         } else {
-            newActor.tell(lostMessage);
+            newActor.tell(lostMessage.getValue());
         }
         return newActor;
     }
