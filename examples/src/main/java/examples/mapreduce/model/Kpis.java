@@ -1,8 +1,11 @@
 package examples.mapreduce.model;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Kpis {
 
-    final int[] kpis;
+    private final int[] kpis;
 
     public Kpis(int[] kpis) {
         this.kpis = kpis;
@@ -35,5 +38,11 @@ public class Kpis {
                 ", C=" + getTotalClicks() +
                 ", B=" + getTotalBuys() +
                 '}';
+    }
+
+    public String toCsv() {
+        return Arrays.stream(kpis)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.joining(";"));
     }
 }

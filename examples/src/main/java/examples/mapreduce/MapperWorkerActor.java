@@ -8,13 +8,13 @@ import examples.mapreduce.model.EventsPerIdMap;
 import examples.mapreduce.model.Transformer;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
+
+import static examples.FileUtils.toResourcePath;
+
 
 public class MapperWorkerActor extends Actor {
 
@@ -28,7 +28,7 @@ public class MapperWorkerActor extends Actor {
 
     private void onNewSourceFile(String filePath, ActorRef sender) {
 
-        final Path file = toResourcePath(filePath);
+        final Path file = toResourcePath(filePath, this.getClass());
 
         try (Stream<String> lines = Files.lines(file)) {
 
@@ -57,14 +57,5 @@ public class MapperWorkerActor extends Actor {
         final int[] values = Transformer.toEventTypeArray(eventType);
         final int id = Integer.parseInt(fields[1]);
         return new AbstractMap.SimpleEntry<>(id, values);
-    }
-
-    private Path toResourcePath(String fileName) {
-        try {
-            final URI fileUri = this.getClass().getClassLoader().getResource(fileName).toURI();
-            return Paths.get(fileUri);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
