@@ -27,6 +27,8 @@ public abstract class Actor {
         this.actorRef = actorRef;
     }
 
+    protected void onActorRegistered() {}
+
     protected ActorRef self() {
         return actorRef;
     }

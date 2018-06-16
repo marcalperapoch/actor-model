@@ -53,6 +53,7 @@ public final class ActorRefImpl implements ActorRef {
             final Actor actor = ctr.newInstance(args);
             final ActorRef address = register(actor, name, args);
             messageDispatcher.onNewActor(actor);
+            actor.onActorRegistered();
             return address;
         } catch (Exception e) {
             throw new RuntimeException(e);

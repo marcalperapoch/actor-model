@@ -13,7 +13,7 @@ public class MessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
     private final Map<Class<?>, BiConsumer<?, ActorRef>> handlers;
 
-    public MessageHandler(Builder builder) {
+    private MessageHandler(Builder builder) {
         this.handlers = builder.handlers;
     }
 
