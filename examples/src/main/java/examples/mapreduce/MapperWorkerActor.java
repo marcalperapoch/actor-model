@@ -34,15 +34,16 @@ public class MapperWorkerActor extends Actor {
 
             final Map<Integer, List<int[]>> eventsPerId = new HashMap<>();
 
-            lines.map(this::toMapEntry).forEach(entry -> {
-                eventsPerId.compute(entry.getKey(), (id, values) -> {
-                    if (values == null) {
-                        values = new ArrayList<>();
-                    }
-                    values.add(entry.getValue());
-                    return values;
-                });
-            });
+            lines.map(this::toMapEntry)
+                    .forEach(entry ->
+                        eventsPerId.compute(entry.getKey(), (id, values) -> {
+                            if (values == null) {
+                                values = new ArrayList<>();
+                            }
+                            values.add(entry.getValue());
+                            return values;
+                        })
+                    );
 
             sender.tell(new EventsPerIdMap(eventsPerId));
 

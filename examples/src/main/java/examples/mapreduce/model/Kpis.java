@@ -43,6 +43,6 @@ public class Kpis {
     public String toCsv() {
         return Arrays.stream(kpis)
                 .mapToObj(String::valueOf)
-                .collect(Collectors.joining(";"));
+                .collect(Collectors.joining(","));
     }
 }

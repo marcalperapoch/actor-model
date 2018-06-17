@@ -48,12 +48,13 @@ public class ReducerActor extends Actor {
 
     private void onEventsPerIdReceived(EventsPerIdMap eventsPerIdMap, ActorRef sender) {
         this.orchestrator = sender;
-        eventsPerIdMap.stream().forEach(eventsPerId -> {
-            final ActorRef reducerWorker = reducers.poll();
-            ++pendingReductions;
-            reducerWorker.tell(eventsPerId, self());
-            reducers.offer(reducerWorker);
-        });
+        eventsPerIdMap.stream()
+                .forEach(eventsPerId -> {
+                    final ActorRef reducerWorker = reducers.poll();
+                    ++pendingReductions;
+                    reducerWorker.tell(eventsPerId, self());
+                    reducers.offer(reducerWorker);
+                });
     }
 
     private void onKpisPerIdReceived(KpisPerId newKpisPerId, ActorRef sender) {

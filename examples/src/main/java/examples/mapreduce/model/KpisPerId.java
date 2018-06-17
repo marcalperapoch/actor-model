@@ -18,5 +18,11 @@ public class KpisPerId {
         return kpis;
     }
 
-
+    @Override
+    public String toString() {
+        return "KpisPerId{" +
+                "id=" + id +
+                ", kpis=" + kpis +
+                '}';
+    }
 }

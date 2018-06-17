@@ -3,17 +3,12 @@ package examples.mapreduce;
 import com.perapoch.concurrency.ActorRef;
 import com.perapoch.concurrency.core.Actor;
 import com.perapoch.concurrency.core.MessageHandler;
-import examples.TestUtils;
+import examples.FileUtils;
 import examples.mapreduce.model.EventsPerIdMap;
 import examples.mapreduce.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -43,7 +38,7 @@ public class OrchestratorActor extends Actor {
                 .build();
     }
 
-    private void onNewOrderReceived(String order, ActorRef actorRef) {
+    private void onNewOrderReceived(String order, ActorRef sender) {
         if ("start".equals(order)) {
             FILES.forEach(fileName -> mapper.tell(fileName, self()));
         }
@@ -56,14 +51,9 @@ public class OrchestratorActor extends Actor {
     private void onResultReceived(Result result, ActorRef sender) {
         LOGGER.info("Orchestrator has received {}", result);
 
-        final Path destinationPath = Paths.get(DESTINATION_FILE);
-        try (BufferedWriter writer = Files.newBufferedWriter(destinationPath)) {
+        FileUtils.writeToFile(result.toCsv(), DESTINATION_FILE);
 
-            writer.write(result.toCsv());
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        LOGGER.info("Orchestrator has written the results in {}", DESTINATION_FILE);
 
     }
 }

@@ -14,21 +14,28 @@ public class Result {
     }
 
     public String toCsv() {
-        final StringBuilder sb = new StringBuilder("id;");
+        final StringBuilder sb = new StringBuilder("id,");
 
         final String headers = Arrays.stream(EventType.values())
                 .map(eventType -> eventType.toString().toLowerCase())
-                .collect(Collectors.joining(";"));
+                .collect(Collectors.joining(","));
 
         sb.append(headers).append("\n");
 
-        kpisPerId.entrySet().forEach(entry -> {
+        kpisPerId.entrySet().forEach(entry ->
             sb.append(entry.getKey())
-                    .append(";")
+                    .append(",")
                     .append(entry.getValue().toCsv())
-                    .append("\n");
-        });
+                    .append("\n")
+        );
 
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "kpisPerId=" + kpisPerId +
+                '}';
     }
 }
