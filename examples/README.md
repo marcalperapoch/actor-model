@@ -62,6 +62,8 @@ id,impression,click,buy
 ...
 ```
 
+where, for each id, we have the total accumulated number of impressions, clicks and buy events.
+
 ### How to run it?
 
 1. Generate fake event files 
