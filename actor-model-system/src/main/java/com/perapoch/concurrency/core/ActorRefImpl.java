@@ -74,7 +74,7 @@ public final class ActorRefImpl implements ActorRef {
         final ActorRef actorRef = createNewAddress(name);
         actor.setActorRef(actorRef);
 
-        actorRecipes.computeIfAbsent(actorRef.getAddress(), path ->  new ActorRecipe(actor.getClass(), name, args));
+        actorRecipes.computeIfAbsent(actorRef.getAddress(), path -> new ActorRecipe(actor.getClass(), name, args));
 
         return actorRef;
     }
@@ -84,8 +84,10 @@ public final class ActorRefImpl implements ActorRef {
         return new ActorRefImpl(newAddress, messageDispatcher);
     }
 
-    private Class<?>[] toTypes(Object ...  args) {
-        return Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new);
+    private Class<?>[] toTypes(Object ... args) {
+        return Arrays.stream(args)
+                .map(Object::getClass)
+                .toArray(Class<?>[]::new);
     }
 
     @Override

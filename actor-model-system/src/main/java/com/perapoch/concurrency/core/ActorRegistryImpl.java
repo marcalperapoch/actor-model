@@ -7,7 +7,7 @@ public class ActorRegistryImpl implements ActorRegistry {
 
     private final Map<ActorAddress, Actor> registry;
 
-    public ActorRegistryImpl() {
+    ActorRegistryImpl() {
         this.registry = new ConcurrentHashMap<>();
     }
 

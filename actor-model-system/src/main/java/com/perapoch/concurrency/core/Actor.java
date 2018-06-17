@@ -19,18 +19,18 @@ public abstract class Actor {
 
     protected abstract MessageHandler createMessageHandler();
 
+    protected void onActorRegistered() {}
+
+    protected ActorRef self() {
+        return actorRef;
+    }
+
     <T> void onReceive(Message<T> msg) {
         messageHandler.handle(msg);
     }
 
     void setActorRef(ActorRef actorRef) {
         this.actorRef = actorRef;
-    }
-
-    protected void onActorRegistered() {}
-
-    protected ActorRef self() {
-        return actorRef;
     }
 
     ActorRef getActorRef() {
@@ -53,10 +53,6 @@ public abstract class Actor {
         while (other.hasPendingMessages()) {
             enqueueMessage(other.getNextMessage());
         }
-    }
-
-    ActorRef getContext() {
-        return actorRef;
     }
 
     ActorAddress getAddress() {

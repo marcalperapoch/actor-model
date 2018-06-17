@@ -31,15 +31,15 @@ public class ActorAddress {
         return !isRoot() && !isAnonymous();
     }
 
-    public Optional<ActorAddress> getParentAddress() {
+    private Path getPath() {
+        return path;
+    }
+
+    Optional<ActorAddress> getParentAddress() {
         if (hasParent()) {
             return Optional.of(ActorAddress.of(path.getParent()));
         }
         return Optional.empty();
-    }
-
-    private Path getPath() {
-        return path;
     }
 
     @Override
@@ -71,15 +71,15 @@ public class ActorAddress {
         return new ActorAddress(path);
     }
 
-    public static ActorAddress rootAddress() {
+    static ActorAddress rootAddress() {
         return ROOT;
     }
 
-    public static ActorAddress anonymousAddress() {
+    static ActorAddress anonymousAddress() {
         return ANONYMOUS;
     }
 
-    public static ActorAddress of(ActorAddress parent, String childName) {
+    static ActorAddress of(ActorAddress parent, String childName) {
         final Path newPath = parent.getPath().resolve(childName);
         return of(newPath);
     }

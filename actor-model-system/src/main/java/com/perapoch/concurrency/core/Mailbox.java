@@ -5,7 +5,7 @@ import java.util.Queue;
 
 final class Mailbox {
 
-    final Queue<Message> messages;
+    private final Queue<Message> messages;
 
     Mailbox() {
         this.messages = new ArrayDeque<>();

@@ -23,7 +23,7 @@ public class MessageDispatcher extends Thread {
     private final Condition notFull;
     private final AtomicInteger pendingMessages;
 
-    public MessageDispatcher(ActorRegistry registry, int numThreads) {
+    MessageDispatcher(ActorRegistry registry, int numThreads) {
         super("MessageDispatcher");
         this.registry = registry;
         this.runningActors = new ConcurrentHashMap<>();

@@ -17,6 +17,7 @@ public class MessageHandler {
         this.handlers = builder.handlers;
     }
 
+    @SuppressWarnings("unchecked")
     <T> void handle(Message<T> message) {
         final T value = message.getValue();
         final Class<T> klass = message.getMessageType();

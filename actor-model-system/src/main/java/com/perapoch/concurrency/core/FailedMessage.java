@@ -4,21 +4,21 @@ import com.perapoch.concurrency.ActorRef;
 
 import java.util.Optional;
 
-public class FailedMessage {
+class FailedMessage {
 
     private final Message originalMessage;
     private final ActorRef toAddress;
 
-    public FailedMessage(Message original, ActorRef to) {
+    FailedMessage(Message original, ActorRef to) {
         this.originalMessage = original;
         this.toAddress = to;
     }
 
-    public Message getOriginalMessage() {
+    Message getOriginalMessage() {
         return originalMessage;
     }
 
-    public ActorRef getDestinatary() {
+    ActorRef getDestinatary() {
         return toAddress;
     }
 }

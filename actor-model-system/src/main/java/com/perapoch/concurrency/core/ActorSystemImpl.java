@@ -6,14 +6,12 @@ import com.perapoch.concurrency.ActorSystem;
 public class ActorSystemImpl implements ActorSystem {
 
     private final MessageDispatcher messageDispatcher;
-    private final ActorRegistry actorRegistry;
-    private final ActorRef systemRef;
     private final ActorRef rootSupervisor;
 
     public ActorSystemImpl(int numThreads) {
-        this.actorRegistry = new ActorRegistryImpl();
+        final ActorRegistry actorRegistry = new ActorRegistryImpl();
         this.messageDispatcher = new MessageDispatcher(actorRegistry, numThreads);
-        this.systemRef = new ActorRefImpl(ActorAddress.rootAddress(), messageDispatcher);
+        final ActorRef systemRef = new ActorRefImpl(ActorAddress.rootAddress(), messageDispatcher);
         this.rootSupervisor = systemRef.newActor(RootSupervisor.class, "root");
     }
 

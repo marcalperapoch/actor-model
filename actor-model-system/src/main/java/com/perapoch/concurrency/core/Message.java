@@ -3,7 +3,6 @@ package com.perapoch.concurrency.core;
 import com.perapoch.concurrency.ActorRef;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class Message<T> {
 
@@ -17,15 +16,15 @@ public class Message<T> {
         this.from = from;
     }
 
-    public ActorRef getFrom() {
+    ActorRef getFrom() {
         return from;
     }
 
-    public T getValue() {
+    T getValue() {
         return value;
     }
 
-    public Class<T> getMessageType() {
+    Class<T> getMessageType() {
         return messageType;
     }
 
