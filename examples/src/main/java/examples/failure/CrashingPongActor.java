@@ -35,7 +35,7 @@ public class CrashingPongActor extends Actor {
         } else {
             ++totalPings;
             sleep(ThreadLocalRandom.current().nextInt(500, 2000), TimeUnit.MILLISECONDS);
-           sender.tell("pong");
+            sender.tell("pong");
         }
     }
 

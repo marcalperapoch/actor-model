@@ -6,7 +6,7 @@ import examples.BaseExample;
 public class MapReduceExample extends BaseExample {
 
     private static final int NUM_MAPPERS = 3;
-    private static final int NUM_REDUCERS = 1;
+    private static final int NUM_REDUCERS = 3;
 
     public static void main(String[] args) {
         new MapReduceExample().test();

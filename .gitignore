@@ -6,3 +6,5 @@ out
 .vscode
 dist/
 statistics.csv
+expected_result.csv
+examples/src/main/resources/*.csv

@@ -43,7 +43,7 @@ events_per_page = math.ceil(total_events/NUM_OUTPUT_FILES)
 for i in range(0, total_events, events_per_page):
 
     fileName = "../examples/src/main/resources/events_{}.csv".format(file_index)
-
+    print(fileName)
     with open(fileName, 'w') as out:
 
         to = min(i+events_per_page, total_events)

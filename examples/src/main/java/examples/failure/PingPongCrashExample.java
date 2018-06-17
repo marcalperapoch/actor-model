@@ -8,12 +8,12 @@ import java.io.IOException;
 
 public class PingPongCrashExample extends BaseExample {
 
-    private static final int FAILING_PERCENTAGE = 30;
+    private static final int FAILING_PERCENTAGE = 20;
 
     public void test() {
 
         final ActorRef ponger = actorSystem.newActor(CrashingPongActor.class, "crasheable ponger", FAILING_PERCENTAGE);
-        final ActorRef pinger = actorSystem.newActor(PingActor.class, "ping", ponger);
+        final ActorRef pinger = actorSystem.newActor(PingActor.class, "pinger", ponger);
 
         pinger.tell("start");
 
