@@ -13,7 +13,7 @@ public class ActorSystemImpl implements ActorSystem {
     public ActorSystemImpl(int numThreads) {
         this.actorRegistry = new ActorRegistryImpl();
         this.messageDispatcher = new MessageDispatcher(actorRegistry, numThreads);
-        this.systemRef = new ActorRefImpl(ActorAddress.rootAddress(), messageDispatcher, actorRegistry);
+        this.systemRef = new ActorRefImpl(ActorAddress.rootAddress(), messageDispatcher);
         this.rootSupervisor = systemRef.newActor(RootSupervisor.class, "root");
     }
 

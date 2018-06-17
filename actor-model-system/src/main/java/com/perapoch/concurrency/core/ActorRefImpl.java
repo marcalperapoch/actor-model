@@ -13,15 +13,11 @@ public final class ActorRefImpl implements ActorRef {
 
     private final ActorAddress address;
     private final MessageDispatcher messageDispatcher;
-    private final ActorRegistry registry;
     private final Map<ActorAddress, ActorRecipe> actorRecipes;
 
-    ActorRefImpl(final ActorAddress address,
-                 final MessageDispatcher messageDispatcher,
-                 final ActorRegistry registry) {
+    ActorRefImpl(final ActorAddress address, final MessageDispatcher messageDispatcher) {
         this.address = address;
         this.messageDispatcher = messageDispatcher;
-        this.registry = registry;
         this.actorRecipes = new ConcurrentHashMap<>();
     }
 
@@ -37,7 +33,7 @@ public final class ActorRefImpl implements ActorRef {
 
     private <T> void tell(ActorRef to, T msg, ActorRef from) {
         final Message<T> message = new Message<>(msg, from);
-        messageDispatcher.newMessage(registry.getActorByActorRef(to), message);
+        messageDispatcher.sendMessage(to, message);
     }
 
     @Override
@@ -51,10 +47,10 @@ public final class ActorRefImpl implements ActorRef {
             final Class<?>[] types = toTypes(args);
             final Constructor<? extends Actor> ctr = ConstructorUtils.getMatchingAccessibleConstructor(klass, types);
             final Actor actor = ctr.newInstance(args);
-            final ActorRef address = register(actor, name, args);
+            final ActorRef actorRef = register(actor, name, args);
             messageDispatcher.onNewActor(actor);
             actor.onActorRegistered();
-            return address;
+            return actorRef;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -80,14 +76,12 @@ public final class ActorRefImpl implements ActorRef {
 
         actorRecipes.computeIfAbsent(actorRef.getAddress(), path ->  new ActorRecipe(actor.getClass(), name, args));
 
-        registry.registerActor(actor);
-
         return actorRef;
     }
 
     private ActorRef createNewAddress(String name) {
         final ActorAddress newAddress = ActorAddress.of(address, name);
-        return new ActorRefImpl(newAddress, messageDispatcher, registry);
+        return new ActorRefImpl(newAddress, messageDispatcher);
     }
 
     private Class<?>[] toTypes(Object ...  args) {

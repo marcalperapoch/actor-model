@@ -1,10 +1,9 @@
 package com.perapoch.concurrency.core;
 
+import com.perapoch.concurrency.ActorRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +33,11 @@ public class MessageDispatcher extends Thread {
         this.pendingMessages = new AtomicInteger(0);
     }
 
-    void newMessage(final Actor actor, final Message message) {
+    void sendMessage(final ActorRef to, final Message message) {
+        sendMessage(registry.getActorByActorRef(to), message);
+    }
+
+    void sendMessage(final Actor actor, final Message message) {
 
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -48,6 +51,7 @@ public class MessageDispatcher extends Thread {
     }
 
     void onNewActor(final Actor actor) {
+        registry.registerActor(actor);
         runningActors.putIfAbsent(actor, false);
         LOGGER.info("*** New actor \"{}\". Total actors = {}", actor.getAddress(), runningActors.size());
     }

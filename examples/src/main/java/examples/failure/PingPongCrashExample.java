@@ -20,7 +20,6 @@ public class PingPongCrashExample extends BaseExample {
     }
 
     public static void main(String[] args) throws IOException {
-        //System.in.read();
         new PingPongCrashExample().test();
     }
 }
